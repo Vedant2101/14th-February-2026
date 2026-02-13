@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Special Question</title>
+ 
+<style>
+body{
+    margin:0;
+    padding:0;
+    background:#000;
+    font-family:'Segoe UI', sans-serif;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    flex-direction:column;
+    color:white;
+}
+ 
+.container{
+    text-align:center;
+    max-width:90%;
+}
+ 
+/* Golden Text */
+.golden{
+    font-size:2.3rem;
+    background:linear-gradient(45deg,gold,white,gold);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:0 0 20px gold;
+}
+ 
+/* Smooth popup */
+.fadeUp{
+    opacity:0;
+    transform:translateY(40px);
+    animation:fadeUp 3.5s forwards;
+}
+ 
+@keyframes fadeUp{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+ 
+/* Buttons side by side */
+.buttons{
+    margin-top:40px;
+    display:flex;
+    gap:30px;
+    justify-content:center;
+}
+ 
+button{
+    padding:14px 35px;
+    font-size:18px;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 0 15px rgba(255,255,255,0.3);
+}
+ 
+#yesBtn{
+    background:white;
+    color:black;
+}
+ 
+#yesBtn:hover{
+    transform:scale(1.1);
+}
+ 
+#noBtn{
+    background:#ff2e63;
+    color:white;
+    position:relative;
+}
+ 
+/* Firework particles */
+.particle{
+    position:absolute;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    pointer-events:none;
+    animation:explode 1.5s ease-out forwards;
+}
+ 
+@keyframes explode{
+    to{
+        transform:translate(var(--x), var(--y));
+        opacity:0;
+    }
+}
+ 
+</style>
+</head>
+ 
+<body>
+ <audio id="romanticPiano" loop preload="auto">
+  <source src="https://cdn.pixabay.com/audio/2022/10/30/audio_946b8a2a8b.mp3" type="audio/mp3">
+</audio>
+<div class="container">
+    <div id="intro" class="golden fadeUp">
+        Hi Penguin...
+    </div>
+ 
+    <div id="question" class="golden fadeUp">
+        Will You Be My Valentine?
+    </div>
+ 
+    <div class="buttons">
+        <button id="yesBtn">YES 💕</button>
+        <button id="noBtn">NO 💔</button>
+    </div>
+</div>
+ 
+<script>
+const piano = document.getElementById("romanticPiano");
+ 
+function playPiano(){
+    piano.volume = 0;
+    piano.play().catch(()=>{
+        document.addEventListener("click", ()=>{
+            piano.play();
+        }, { once:true });
+    });
+ 
+    // Smooth volume fade-in
+    let fade = setInterval(()=>{
+        if(piano.volume < 0.6){
+            piano.volume += 0.05;
+        } else {
+            clearInterval(fade);
+        }
+    },200);
+}
+ 
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+const intro=document.getElementById("intro");
+const question=document.getElementById("question");
+ 
+// Keep NO inside screen
+noBtn.addEventListener("mouseover",function(){
+    const padding=20;
+    const maxX=window.innerWidth-noBtn.offsetWidth-padding;
+    const maxY=window.innerHeight-noBtn.offsetHeight-padding;
+ 
+    const randomX=Math.random()*(maxX-padding)+padding;
+    const randomY=Math.random()*(maxY-padding)+padding;
+ 
+    noBtn.style.position="fixed";
+    noBtn.style.left=randomX+"px";
+    noBtn.style.top=randomY+"px";
+});
+ 
+// Premium Firework
+function createFirework(x,y){
+    for(let i=0;i<50;i++){
+        const particle=document.createElement("div");
+        particle.classList.add("particle");
+ 
+        const angle=Math.random()*2*Math.PI;
+        const distance=Math.random()*180+60;
+ 
+        const dx=Math.cos(angle)*distance+"px";
+        const dy=Math.sin(angle)*distance+"px";
+ 
+        particle.style.setProperty("--x",dx);
+        particle.style.setProperty("--y",dy);
+        particle.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        particle.style.left=x+"px";
+        particle.style.top=y+"px";
+ 
+        document.body.appendChild(particle);
+        setTimeout(()=>particle.remove(),1500);
+    }
+}
+ 
+// YES click → loop celebration
+yesBtn.addEventListener("click",function(){
+ 
+    intro.innerHTML="🎉 She Said YESSSS 🎉";
+    question.style.display="none";
+    document.querySelector(".buttons").style.display="none";
+ 
+    // Continuous loop fireworks
+    setInterval(()=>{
+        const x=Math.random()*window.innerWidth;
+        const y=Math.random()*window.innerHeight/2;
+        createFirework(x,y);
+    },700);
+ 
+});
+</script>
+ 
+</body>
+</html>
